@@ -7,13 +7,22 @@
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
     <link rel="stylesheet" href="timepicker/jquery-ui-timepicker-addon.min.css">
     <script src="timepicker/jquery-ui-timepicker-addon.min.js"></script>
     <script src="timepicker/jquery-ui-timepicker-ja.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 </head>
 <body>
+    <style>
+        button.image-button {
+            height: 26px;
+        }
+
+        .image-button img {
+            height: 12px;
+        }
+    </style>
     <div>
         <h2>Googleカレンダー登録</h2>
         <p>Googleカレンダーに登録します。</p>
@@ -30,70 +39,25 @@
         <label><input type="checkbox" id="allday"/>終日</label>
 
         <p>
-            <button type="button" onclick="generateUrl();">Googleカレンダー登録</button>
+            Googleカレンダーの登録画面を新規ウインドウで開きます。<br/>
+            <button type='button' onclick='openGoogleUrl();'>Googleカレンダーを開く</button>
+            <button type='button' onclick='copyGoogleUrl();' class='image-button' title='Googleカレンダー登録URLをコピーします'>
+                <img src='img/copy.svg'/>
+            </button>
         </p>
+
+        <p>
+            現在の入力内容を反映したURLを開く<br/>
+            <button type='button' onclick='openCurrentUrl();'>予定入力URLを開く</button>
+            <button type='button' onclick='copyCurrentUrl();' class='image-button' title='Googleカレンダー登録URLをコピーします'>
+                <img src='img/copy.svg'/>
+            </button>
+        </p>
+
 
     </div>
 
 </body>
-<script>
-$(function() {
-    $.datepicker.setDefaults( $.datepicker.regional[ "ja" ] );
-    $( ".picker" ).datetimepicker();
-    let dj = dayjs();
-    dj = dj.date(dj.date()+1);
-    dj = dj.minute(0);
-    const startDateTime = dj.format('YYYY/MM/DD HH:mm');
-    const dj2 = dj.hour(dj.hour()+1);
-    const endDateTime = dj2.format('YYYY/MM/DD HH:mm');
+<script src="js/calappend.js"></script>
 
-   $('#start-date').val(startDateTime);
-});
-
-function createDates(allDay, st, ed) {
-    const stdj = dayjs(st, 'YYYY/MM/DD HH:mm');
-    const eddj = ed ? dayjs(ed, 'YYYY/MM/DD HH:mm') : stdj.hour(stdj.hour()+1);
-    if (!allDay) {
-        const startDate = stdj.format('YYYYMMDD');
-        const startTime = stdj.format('HHmm');
-        const endDate = eddj.format('YYYYMMDD');
-        const endTime = eddj.format('HHmm');
-        return `${startDate}T${startTime}/${endDate}T${endTime}`;
-    }
-
-    const startDate = stdj.format('YYYYMMDD');
-    const eddj2 = eddj.date(eddj.date()+1);
-    const endDate = eddj2.format('YYYYMMDD');
-    return `${startDate}/${endDate}`;
-}
-
-function generateUrl() {
-    const title = $('#title').val();
-    if (!title) {
-        alert('タイトルは必須です');
-        return;
-    }
-    const details = $('#details').val();
-    const st = $('#start-date').val();
-    const ed = $('#end-date').val();
-    console.log(st);
-    console.log(ed);
-    const allDay = $('#allday').prop('checked');
-
-    const dates = createDates(allDay, st, ed);
-
-    const params = new URLSearchParams();
-    params.append("action", "TEMPLATE");
-    params.append("dates", dates);
-    params.append("text", title);
-
-    if (details) {
-        params.append("details", details);
-    }
-    const query = params.toString();
-    const url = 'https://www.google.com/calendar/render?' + query;
-
-    window.open(url);
-}
-</script>
 </html>
